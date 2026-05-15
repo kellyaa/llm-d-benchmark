@@ -1,6 +1,6 @@
-# GKE H100 CI/CD Specification - FMA
-# FMA variant of cicd/gke — uses nop harness.
-# See scenarios/cicd/gke-fma.yaml for details.
+# CKS CI/CD Specification - Nop
+# Nop harness variant for FMA and standalone.
+# See scenarios/cicd/cks-nop.yaml for details.
 
 # [REQUIRED]
 {% set base_dir = base_dir | default('../') -%}
@@ -16,4 +16,4 @@ template_dir:
 
 # [OPTIONAL]
 scenario_file:
-  path: {{ base_dir }}/config/scenarios/cicd/gke-fma.yaml
+  path: {{ base_dir }}/config/scenarios/cicd/cks-nop.yaml

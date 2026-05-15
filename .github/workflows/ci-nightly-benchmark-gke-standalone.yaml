@@ -14,7 +14,7 @@ on:
       cluster_provider:
         description: 'Cluster provider targeted ("ocp","gke","cks")'
         required: false
-        default: 'gke'
+        default: 'gke-nop'
       cluster_namespace:
         description: 'Cluster namespace'
         required: false
@@ -71,7 +71,7 @@ jobs:
     with:
       scenario_dir: ${{ inputs.scenario_dir || 'cicd' }}
       standup_method: ${{ inputs.standup_method || 'standalone' }}
-      cluster_provider: ${{ inputs.cluster_provider || 'gke' }}
+      cluster_provider: ${{ inputs.cluster_provider || 'gke-nop' }}
       cluster_namespace: ${{ inputs.cluster_namespace || 'llmdbenchcicdsns-gke' }}
       helm_release: ${{ inputs.helm_release || 'llmdbenchcicdr-gke' }}
       workspace_dir: ${{ inputs.workspace_dir || '/tmp/llmdbenchcicds-gke' }}

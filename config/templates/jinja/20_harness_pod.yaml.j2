@@ -142,5 +142,6 @@ spec:
 {% endif %}
 {% if harness.serviceAccount is defined and harness.serviceAccount %}
   serviceAccountName: {{ harness.serviceAccount }}
+  automountServiceAccountToken: true
 {% endif %}
   restartPolicy: Never

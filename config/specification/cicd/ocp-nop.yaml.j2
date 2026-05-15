@@ -1,6 +1,6 @@
-# OpenShift Container Platform CI/CD Specification - FMA
-# FMA variant of cicd/ocp — uses nop harness.
-# See scenarios/cicd/ocp-fma.yaml for details.
+# OpenShift Container Platform CI/CD Specification - Nop
+# Nop harness variant for FMA and standalone.
+# See scenarios/cicd/ocp-nop.yaml for details.
 
 # [REQUIRED]
 {% set base_dir = base_dir | default('../') -%}
@@ -16,4 +16,4 @@ template_dir:
 
 # [OPTIONAL]
 scenario_file:
-  path: {{ base_dir }}/config/scenarios/cicd/ocp-fma.yaml
+  path: {{ base_dir }}/config/scenarios/cicd/ocp-nop.yaml

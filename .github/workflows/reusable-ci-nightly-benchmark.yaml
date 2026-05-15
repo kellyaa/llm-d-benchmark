@@ -112,7 +112,7 @@ jobs:
       - name: set runs-on variable based on cluster provider
         id: set_runs_on
         run: |
-          if [[ ${{ inputs.cluster_provider }} == "ocp" ]]; then
+          if [[ "${{ inputs.cluster_provider }}" == ocp* ]]; then
             JSON_LIST='["self-hosted", "openshift", "pok-prod"]'
           else
             JSON_LIST='["ubuntu-latest"]'
@@ -177,25 +177,25 @@ jobs:
           install_components: 'kubectl,gke-gcloud-auth-plugin'
 
       - name: Get GKE credentials
-        if: inputs.cluster_provider == 'gke'
+        if: startsWith(inputs.cluster_provider, 'gke')
         run: |
           gcloud container clusters get-credentials "${{ env.GKE_CLUSTER_NAME }}" --zone "${{ env.GKE_CLUSTER_ZONE }}"
 
       - name: Set up kubeconfig from secret
-        if: inputs.cluster_provider != 'kind' && inputs.cluster_provider != 'gke'
+        if: inputs.cluster_provider != 'kind' && !startsWith(inputs.cluster_provider, 'gke')
         run: |
           mkdir -p ~/.kube
-          if [[ $LLMDBENCH_CICD_TARGET == "cks" ]]; then
+          if [[ $LLMDBENCH_CICD_TARGET == cks* ]]; then
             echo "${{ secrets.KUBECONFIG_DATA_CKS }}" | base64 -d > ~/.kube/config
           fi
-          if [[ $LLMDBENCH_CICD_TARGET == "ocp" ]]; then
+          if [[ $LLMDBENCH_CICD_TARGET == ocp* ]]; then
             echo "${{ secrets.KUBECONFIG_DATA_OCP }}" | base64 -d > ~/.kube/config
           fi
           chmod 600 ~/.kube/config
         shell: bash
 
       - name: Install oc (optional on install.sh)
-        if: inputs.cluster_provider == 'ocp'
+        if: startsWith(inputs.cluster_provider, 'ocp')
         run: |
           # Install oc (OpenShift CLI) — optional on install.sh
           if ! command -v oc &>/dev/null; then
@@ -299,7 +299,7 @@ jobs:
         shell: bash
 
       - name: Block waiting for Standalone baseline
-        if: inputs.cluster_provider != 'kind' && inputs.bucket_provider == 'gcs'
+        if: inputs.cluster_provider != 'kind' && inputs.bucket_provider == 'gcs' && inputs.standup_method == 'fma'
         run: |
           if [[ "${{ inputs.dry_run }}" == "true" ]]; then
             echo "Skipping waiting for \"standalone baseline\", due to \"dry-run\" mode activated"
@@ -308,15 +308,14 @@ jobs:
             RUN_DATE=$(date +'%Y-%m-%d')
             POLL=30
             while true; do
-              brl=$(gcloud storage ls -l "gs://${GCS_PATH}/$LLMDBENCH_CICD_TARGET/standalone/$RUN_DATE/*/results/*/benchmark_report_v0.2*")
-              if [[ $? -ne 0 ]]; then
-                echo "Standalone baseline for \"$RUN_DATE\" still not present. Waiting $POLL seconds and trying again..."
-                sleep $POLL
-              else
+              if brl=$(gcloud storage ls -l "gs://${GCS_PATH}/$LLMDBENCH_CICD_TARGET/standalone/$RUN_DATE/*/results/*/benchmark_report/result.yaml" 2>/dev/null); then
                 latest_entry=$(echo "$brl" | sort -k 2 | tail -n 2 | head -n 1 | awk '{ print $3 }')
                 latest_dir=$(echo "$latest_entry" | sed "s^gs://${GCS_PATH}/$LLMDBENCH_CICD_TARGET/standalone/$RUN_DATE/^^g" | cut -d '/' -f 1)
                 echo "Standalone baseline for \"$RUN_DATE\" is \"$latest_dir\"."
                 exit 0
+              else
+                echo "Standalone baseline for \"$RUN_DATE\" still not present. Waiting $POLL seconds and trying again..."
+                sleep $POLL
               fi
             done
           fi

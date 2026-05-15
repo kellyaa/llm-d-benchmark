@@ -1407,6 +1407,7 @@ harness:
   profile: sanity_random.yaml
   executable: llm-d-benchmark.sh
   condaEnvName: inference-perf-env
+  serviceAccount: inference-perf-runner
   waitTimeout: 3600
   loadParallelism: 1
   podLabel: llmdbench-harness-launcher

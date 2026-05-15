@@ -390,6 +390,7 @@ class HarnessConfig(BaseModel):
     experimentProfile: str | None = None
     executable: str
     condaEnvName: str
+    serviceAccount: str | None = None
     waitTimeout: int = Field(ge=0)
     loadParallelism: int = Field(ge=1)
     podLabel: str

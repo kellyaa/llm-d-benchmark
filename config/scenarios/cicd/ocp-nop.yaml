@@ -1,6 +1,5 @@
-# OpenShift Container Platform CI/CD Scenario - FMA
-# Variant of cicd/ocp.yaml for Fast Model Actuation (FMA) runs.
-# Uses nop harness since FMA manages its own endpoint discovery.
+# OpenShift Container Platform CI/CD Scenario - Nop
+# Variant of cicd/ocp.yaml with Nop for FMA and standalone.
 
 scenario:
   - name: "ocp-cicd"
@@ -16,10 +15,15 @@ scenario:
       nodeSelector:
         nvidia.com/gpu.product: NVIDIA-H100-80GB-HBM3
 
+    decode:
+      enabled: false
     modelservice:
       enabled: false
     standalone:
-      enabled: false
+      enabled: true
+      acceleratorType:
+        labelKey: nvidia.com/gpu.product
+        labelValue: NVIDIA-H100-80GB-HBM3
     fma:
       enabled: true
       iterations: 5
